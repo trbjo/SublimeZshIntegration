@@ -1,6 +1,6 @@
-alias -g st='$(subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print -n $sublime_file_name)'
+alias -g st='"$(subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print -n $sublime_file_name)"'
 alias stx='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod +x "$sublime_file_name"'
-alias -g ste='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print $sublime_file_name |& tee /dev/tty |& wl-copy -n'
+alias -g ste='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${(qqq)sublime_file_name} |& tee /dev/tty |& wl-copy -n'
 alias -g stn='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
 
 goto_sublime_current_dir() {
