@@ -1,7 +1,8 @@
-alias -g st='"$(subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print -n $sublime_file_name)"'
-alias stx='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod +x "$sublime_file_name"'
-alias -g ste='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${(qqq)sublime_file_name} |& tee /dev/tty |& wl-copy -n'
+alias -g st='"$(subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; wl-copy -n "${(qqq)sublime_file_name}"; print $sublime_file_name > /dev/tty;  print -n $sublime_file_name)"'
+alias st+='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod +x "$sublime_file_name"'
+alias st-='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod -x "$sublime_file_name"'
 alias -g stn='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
+alias -g ste='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
 
 goto_sublime_current_dir() {
     if [[ "$BUFFER" ]]; then
@@ -9,6 +10,7 @@ goto_sublime_current_dir() {
         zle accept-line
         return 0
     fi
+    pkill -CONT "sublime_text|plugin_host-3.3|plugin_host-3.8"
     /opt/sublime_text/sublime_text --command get_sublime_folder_name
     [ -f /tmp/sublime_folder_name ] && read subldir </tmp/sublime_folder_name
     if [[ "${subldir}" != "${PWD}" ]]; then
@@ -50,6 +52,7 @@ add-zsh-hook precmd __add_goto_sublime_current_dir_to_zsh_autosuggest_clear_widg
 add-zsh-hook preexec __remove_goto_sublime_current_dir
 
 save() {
+    pkill -CONT "sublime_text|plugin_host-3.8"
     /opt/sublime_text/sublime_text --command get_sublime_file_name
     [ -f /tmp/sublime_file_name ] && read sublime_file_name </tmp/sublime_file_name
     if [[ "$sublime_file_name" == "/etc/doas.conf" ]]; then
