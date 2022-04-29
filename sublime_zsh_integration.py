@@ -1,12 +1,13 @@
-from os import path
+from os import path, getuid
 from sublime_plugin import WindowCommand
 import subprocess
+USER_ID = getuid()
 
 class GetSublimeFileNameCommand(WindowCommand):
     def run(self):
         buf = self.window.active_view().file_name()
         if buf is not None:
-            f = open("/tmp/sublime_file_name", "w")
+            f = open(f"/tmp/sublime_{USER_ID}_file_name", "w")
             f.write(buf)
             f.close()
 
@@ -14,7 +15,7 @@ class GetSublimeFolderNameCommand(WindowCommand):
     def run(self):
         buf = self.window.active_sheet().file_name()
         if buf is not None:
-            f = open("/tmp/sublime_folder_name", "w")
+            f = open(f"/tmp/sublime_{USER_ID}_folder_name", "w")
             f.write(path.dirname(buf).replace(r' ', r'\ '))
             f.close()
 

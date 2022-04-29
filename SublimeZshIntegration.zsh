@@ -1,8 +1,8 @@
-alias -g st='"$(subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; wl-copy -n "${(qqq)sublime_file_name}"; print $sublime_file_name > /dev/tty;  print -n $sublime_file_name)"'
-alias st+='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod +x "$sublime_file_name"'
-alias st-='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; chmod -x "$sublime_file_name"'
-alias -g stn='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
-alias -g ste='subl --command get_sublime_file_name; read sublime_file_name </tmp/sublime_file_name; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
+alias -g st='"$(subl --command get_sublime_file_name; read sublime_file_name < /tmp/sublime_${UID}_file_name; wl-copy -n "${(qqq)sublime_file_name}"; print $sublime_file_name > /dev/tty;  print -n $sublime_file_name)"'
+alias st+='subl --command get_sublime_file_name; read sublime_file_name < /tmp/sublime_${UID}_file_name; chmod +x "$sublime_file_name"'
+alias st-='subl --command get_sublime_file_name; read sublime_file_name < /tmp/sublime_${UID}_file_name; chmod -x "$sublime_file_name"'
+alias -g stn='subl --command get_sublime_file_name; read sublime_file_name < /tmp/sublime_${UID}_file_name; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
+alias -g ste='subl --command get_sublime_file_name; read sublime_file_name < /tmp/sublime_${UID}_file_name; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
 
 backward-delete-char() {
     # goes back in the cd history
@@ -72,7 +72,7 @@ goto_sublime_current_dir() {
     fi
     pkill -CONT "sublime_text|plugin_host-3.3|plugin_host-3.8"
     /opt/sublime_text/sublime_text --command get_sublime_folder_name
-    [ -f /tmp/sublime_folder_name ] && read subldir </tmp/sublime_folder_name
+    [ -f "/tmp/sublime_${UID}_folder_name" ] && read subldir < "/tmp/sublime_${UID}_folder_name"
     if [[ "${subldir}" != "${PWD}" ]]; then
         local precmd
         cd "$subldir" 2> /dev/null
@@ -114,7 +114,7 @@ add-zsh-hook preexec __remove_goto_sublime_current_dir
 save() {
     pkill -CONT "sublime_text|plugin_host-3.8"
     /opt/sublime_text/sublime_text --command get_sublime_file_name
-    [ -f /tmp/sublime_file_name ] && read sublime_file_name </tmp/sublime_file_name
+    [ -f "/tmp/sublime_${UID}_file_name" ] && read sublime_file_name < "/tmp/sublime_${UID}_file_name"
     if [[ "$sublime_file_name" == "/etc/doas.conf" ]]; then
         print "Cannot edit \033[32m\x1B[1m/etc/doas.conf\033[0m, you need to be root"
         return 1
@@ -132,7 +132,7 @@ save() {
 stc() {
     local _myfile _ans _reply
     subl --command get_sublime_file_name
-    _myfile=$(</tmp/sublime_file_name)
+    _myfile=$(< "/tmp/sublime_${UID}_file_name")
     print "Do you want to delete this file: $(_colorizer $_myfile)"
     echo -n "Continue? y or n? "
     until [[ ! -z $_ans ]]; do
