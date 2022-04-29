@@ -72,9 +72,8 @@ goto_sublime_current_dir() {
     fi
     [ -f "$XDG_RUNTIME_DIR/sublime_folder_name" ] && read subldir < "$XDG_RUNTIME_DIR/sublime_folder_name"
     if [[ "${subldir}" != "${PWD}" ]]; then
-        local precmd
         cd "$subldir" 2> /dev/null
-        print -n "\e[?25l\033[F\r"
+        local precmd
         for precmd in $precmd_functions
         do
             $precmd
@@ -83,7 +82,6 @@ goto_sublime_current_dir() {
     else
         update_git_status_wrapper
     fi
-    print -n '\e[?25h'
 }
 zle -N goto_sublime_current_dir
 bindkey -e "^M" goto_sublime_current_dir
