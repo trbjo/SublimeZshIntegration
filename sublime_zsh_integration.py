@@ -1,16 +1,15 @@
-from os import path, getuid
+from os import path, getenv
 from sublime_plugin import WindowCommand, EventListener
-from sublime import View, Window
+from sublime import View
 from sublime_api import view_file_name
 import subprocess
-import stat
 
 class FileNameListener(EventListener):
     def __init__(self) -> None:
-        self.user_id = getuid()
+        xdg_runtime_dir = getenv('XDG_RUNTIME_DIR')
         self.myname = ''
-        self.file = f"/tmp/sublime_{self.user_id}_file_name"
-        self.directory = f"/tmp/sublime_{self.user_id}_folder_name"
+        self.file = f"{xdg_runtime_dir}/sublime_file_name"
+        self.directory = f"{xdg_runtime_dir}/sublime_folder_name"
         f = open(self.file, "w")
         f.write('')
         f.close()
