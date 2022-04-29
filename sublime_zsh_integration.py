@@ -1,23 +1,38 @@
 from os import path, getuid
-from sublime_plugin import WindowCommand
+from sublime_plugin import WindowCommand, EventListener
+from sublime import View, Window
+from sublime_api import view_file_name
 import subprocess
-USER_ID = getuid()
+import stat
 
-class GetSublimeFileNameCommand(WindowCommand):
-    def run(self):
-        buf = self.window.active_view().file_name()
-        if buf is not None:
-            f = open(f"/tmp/sublime_{USER_ID}_file_name", "w")
-            f.write(buf)
-            f.close()
+class FileNameListener(EventListener):
+    def __init__(self) -> None:
+        self.user_id = getuid()
+        self.myname = ''
+        self.file = f"/tmp/sublime_{self.user_id}_file_name"
+        self.directory = f"/tmp/sublime_{self.user_id}_folder_name"
+        f = open(self.file, "w")
+        f.write('')
+        f.close()
+        d = open(self.directory, "w")
+        d.write('')
+        d.close()
 
-class GetSublimeFolderNameCommand(WindowCommand):
-    def run(self):
-        buf = self.window.active_sheet().file_name()
-        if buf is not None:
-            f = open(f"/tmp/sublime_{USER_ID}_folder_name", "w")
-            f.write(path.dirname(buf).replace(r' ', r'\ '))
-            f.close()
+
+    def on_activated_async(self, view: View):
+        file_name: str = view_file_name(view.id())
+        if len(file_name) == 0:
+            return
+        if file_name == self.myname:
+            return
+        self.myname = file_name
+        f = open(self.file, "w")
+        f.write(self.myname)
+        f.close()
+        d = open(self.directory, "w")
+        d.write(path.dirname(self.myname).replace(r' ', r'\ '))
+        d.close()
+
 
 class PasteZshCommand(WindowCommand):
     def run(self):
