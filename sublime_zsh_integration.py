@@ -6,16 +6,16 @@ import subprocess
 
 class FileNameListener(EventListener):
     def __init__(self) -> None:
-        xdg_runtime_dir = getenv('XDG_RUNTIME_DIR')
+        XDG_RUNTIME_DIR = getenv('XDG_RUNTIME_DIR')
         self.myname = ''
-        self.file = f"{xdg_runtime_dir}/sublime_file_name"
-        self.directory = f"{xdg_runtime_dir}/sublime_folder_name"
-        f = open(self.file, "w")
-        f.write('')
-        f.close()
-        d = open(self.directory, "w")
-        d.write('')
-        d.close()
+        self.file = f"{XDG_RUNTIME_DIR}/sublime_file_name"
+        self.directory = f"{XDG_RUNTIME_DIR}/sublime_folder_name"
+        with open(self.file, 'w') as f:
+            f.write('')
+            f.close()
+        with open(self.directory, 'w') as d:
+            d.write('')
+            d.close()
 
 
     def on_activated_async(self, view: View):
@@ -25,12 +25,12 @@ class FileNameListener(EventListener):
         if file_name == self.myname:
             return
         self.myname = file_name
-        f = open(self.file, "w")
-        f.write(self.myname)
-        f.close()
-        d = open(self.directory, "w")
-        d.write(path.dirname(self.myname).replace(r' ', r'\ '))
-        d.close()
+        with open(self.file, 'w') as f:
+            f.write(self.myname)
+            f.close()
+        with open(self.directory, 'w') as d:
+            d.write(path.dirname(self.myname).replace(r' ', r'\ '))
+            d.close()
 
 
 class PasteZshCommand(WindowCommand):
