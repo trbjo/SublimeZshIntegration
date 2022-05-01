@@ -12,11 +12,8 @@ class FileNameListener(EventListener):
         self.directory = f"{XDG_RUNTIME_DIR}/sublime_folder_name"
         with open(self.file, 'w') as f:
             f.write('')
-            f.close()
         with open(self.directory, 'w') as d:
             d.write('')
-            d.close()
-
 
     def on_activated_async(self, view: View):
         file_name: str = view_file_name(view.id())
@@ -27,10 +24,8 @@ class FileNameListener(EventListener):
         self.myname = file_name
         with open(self.file, 'w') as f:
             f.write(self.myname)
-            f.close()
         with open(self.directory, 'w') as d:
             d.write(path.dirname(self.myname).replace(r' ', r'\ '))
-            d.close()
 
 
 class PasteZshCommand(WindowCommand):
