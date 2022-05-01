@@ -1,8 +1,46 @@
-alias -g st='"$(read sublime_file_name < $XDG_RUNTIME_DIR/sublime_file_name; wl-copy -n "${(qqq)sublime_file_name}"; print $sublime_file_name > /dev/tty;  print -n $sublime_file_name)"'
-alias st+='read sublime_file_name < $XDG_RUNTIME_DIR/sublime_file_name; chmod +x "$sublime_file_name"'
-alias st-='read sublime_file_name < $XDG_RUNTIME_DIR/sublime_file_name; chmod -x "$sublime_file_name"'
+alias -g st='"$(cat $XDG_RUNTIME_DIR/sublime_file_name)"'
+alias st+='chmod +x "$(cat $XDG_RUNTIME_DIR/sublime_file_name)"'
+alias st-='chmod -x "$(cat $XDG_RUNTIME_DIR/sublime_file_name)"'
 alias -g stn='read sublime_file_name < $XDG_RUNTIME_DIR/sublime_file_name; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
 alias -g ste='read sublime_file_name < $XDG_RUNTIME_DIR/sublime_file_name; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
+
+# navigate dirs with backspace/shift+backspace
+setopt AUTO_PUSHD
+typeset -a _dirstack
+typeset -a mydirs
+shift_backward() {
+    # mydirs is not regulated when we push to the stack,
+    # so we have to check for elements manually:
+    [[ "${mydirs[-1]}" == "$PWD" ]] && mydirs[-1]=()
+    [[  ${#mydirs} -lt 1 ]] && return
+    print -n '\e[?25l'
+    for (( i = 1; i <= ${#dirstack[@]}; i++ )) do
+        if [[ "$dirstack[$i]" != "$_dirstack[$i]" ]]; then
+            mydirs=()
+            _dirstack=()
+            print -n '\e[?25h'
+            return
+        fi
+    done
+
+    local preexec precmd
+    for preexec in $preexec_functions
+    do
+        $preexec
+    done
+    _dirstack=("$PWD" "$_dirstack[@]")
+    cd "${mydirs[-1]}" > /dev/null 2>&1
+    mydirs[-1]=()
+    for precmd in $precmd_functions
+    do
+        $precmd
+    done
+    zle reset-prompt
+    print -n '\e[?25h'
+    return 0
+    }
+zle -N shift_backward
+bindkey '^]' shift_backward
 
 backward-delete-char() {
     # goes back in the cd history
@@ -24,7 +62,6 @@ backward-delete-char() {
         done
         popd > /dev/null 2>&1
         _dirstack=($dirstack[@])
-        print -n "\033[F\r"
         for precmd in $precmd_functions
         do
             $precmd
@@ -70,17 +107,20 @@ goto_sublime_current_dir() {
         zle accept-line
         return 0
     fi
-    [ -f "$XDG_RUNTIME_DIR/sublime_folder_name" ] && read subldir < "$XDG_RUNTIME_DIR/sublime_folder_name"
-    if [[ "${subldir}" != "${PWD}" ]]; then
-        cd "$subldir" 2> /dev/null
-        local precmd
-        for precmd in $precmd_functions
-        do
-            $precmd
-        done
-        zle reset-prompt
-    else
-        update_git_status_wrapper
+    if [[ -f "$XDG_RUNTIME_DIR/sublime_file_name" ]]; then
+        local subldir
+        read subldir < "$XDG_RUNTIME_DIR/sublime_file_name"
+        if [[ "${subldir}" != "${PWD}" ]]; then
+            cd "${subldir%/*}"
+            local precmd
+            for precmd in $precmd_functions
+            do
+                $precmd
+            done
+            zle reset-prompt
+        else
+            update_git_status_wrapper
+        fi
     fi
 }
 zle -N goto_sublime_current_dir
