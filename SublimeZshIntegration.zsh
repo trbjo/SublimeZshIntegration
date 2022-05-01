@@ -42,6 +42,7 @@ shift_backward() {
 zle -N shift_backward
 bindkey '^]' shift_backward
 
+typeset -gA __matchers=("\"" "\"" "'" "'" "[" "]" "(" ")" "{" "}")
 backward-delete-char() {
     # goes back in the cd history
     if [[ -z "$BUFFER" ]]; then
@@ -108,10 +109,11 @@ goto_sublime_current_dir() {
         return 0
     fi
     if [[ -f "$XDG_RUNTIME_DIR/sublime_file_name" ]]; then
-        local subldir
+        local subldir file
         read subldir < "$XDG_RUNTIME_DIR/sublime_file_name"
-        if [[ "${subldir}" != "${PWD}" ]]; then
-            cd "${subldir%/*}"
+        file="${subldir%/*}"
+        if [[ "${file}" != "${PWD}" ]]; then
+            cd "$file"
             local precmd
             for precmd in $precmd_functions
             do
@@ -119,7 +121,7 @@ goto_sublime_current_dir() {
             done
             zle reset-prompt
         else
-            update_git_status_wrapper
+            gitstatus_query -t -0 -c update_git_status 'MY'
         fi
     fi
 }
