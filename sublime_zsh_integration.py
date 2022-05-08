@@ -9,8 +9,7 @@ class FileNameListener(EventListener):
         XDG_RUNTIME_DIR = getenv('XDG_RUNTIME_DIR')
         self.myname = ''
         self.file = f"{XDG_RUNTIME_DIR}/sublime_file_name"
-        with open(self.file, 'w') as f:
-            f.write('')
+        self.f = open(self.file, 'w')
 
     def on_activated_async(self, view: View):
         file_name: str = view_file_name(view.id())
@@ -19,8 +18,9 @@ class FileNameListener(EventListener):
         if file_name == self.myname:
             return
         self.myname = file_name
-        with open(self.file, 'w') as f:
-            f.write(self.myname.replace(r' ', r'\ '))
+        self.f.seek(0)
+        self.f.write(self.myname.replace(r' ', r'\ '))
+        self.f.truncate()
 
 
 class PasteZshCommand(WindowCommand):
