@@ -104,7 +104,6 @@ bindkey "^?" backward-delete-char
 
 goto_sublime_current_dir() {
     if [[ "$BUFFER" ]]; then
-        unset __autosuggest_override_init
         zle accept-line
         return 0
     fi
