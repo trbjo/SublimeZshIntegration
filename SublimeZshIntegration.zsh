@@ -94,7 +94,8 @@ ${ST_ALIAS}save() {
 
 ${ST_ALIAS}del() {
     local sublime_file_name _ans _reply
-    [[ -f "$__subl_file_path" ]] && read sublime_file_name < "$__subl_file_path" || return 1
+    [[ -f "$__subl_file_path" ]] && read sublime_file_name < "$__subl_file_path"
+    [[ -z "$sublime_file_name" ]] && return 1
     print "Do you want to delete this file: $(_colorizer $sublime_file_name)"
     echo -n "Continue? y or n? "
     until [[ ! -z $_ans ]]; do
