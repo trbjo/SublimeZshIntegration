@@ -26,4 +26,4 @@ class FileNameListener(EventListener):
 class PasteZshCommand(WindowCommand):
     def run(self):
         subprocess.Popen(['/usr/bin/pkill', 'zsh', '--signal=USR2']).wait()
-        subprocess.Popen(['swaymsg', '[title="^PopUp$"]', 'scratchpad', 'show,', 'fullscreen', 'disable,', 'move', 'position', 'center,', 'resize', 'set', 'width', '100ppt', 'height', '100ppt,', 'resize', 'shrink', 'up', '1100px,', 'resize', 'grow', 'up', '150px,', 'move', 'up', '22px,','move', 'left', '1px,', 'resize', 'grow', 'right', '2px']).wait()
+        subprocess.Popen(['swaymsg', '[title="^PopUp$"]', 'scratchpad', 'show,', 'fullscreen', 'disable,', 'move', 'position', 'center,', 'resize', 'set', 'width', '100ppt', 'height', '100ppt,', 'resize', 'shrink', 'up', '1100px,', 'resize', 'grow', 'up', '150px,', 'move', 'down', '1px,','move', 'left', '1px,', 'resize', 'grow', 'right', '2px']).wait()
