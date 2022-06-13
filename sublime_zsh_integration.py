@@ -1,14 +1,26 @@
-from os import path, getenv
-from sublime_plugin import WindowCommand, EventListener
+from os import getenv
+from sublime_plugin import EventListener
+import platform
 from sublime import View
 from sublime_api import view_file_name
-import subprocess
+from typing import Union
 
 class FileNameListener(EventListener):
+    def get_subl_dir(self) -> Union[str,None]:
+        os_type = platform.system()
+        if not os_type:
+            return None
+        if os_type == 'Linux':
+            return getenv('XDG_RUNTIME_DIR')
+        elif os_type == 'Darwin':
+            return getenv('TMPDIR')
+
     def __init__(self) -> None:
-        XDG_RUNTIME_DIR = getenv('XDG_RUNTIME_DIR')
+        SUBL_DIR = self.get_subl_dir()
+        if not SUBL_DIR:
+            return None
         self.myname = ''
-        self.file = f"{XDG_RUNTIME_DIR}/sublime_file_name"
+        self.file = f"{SUBL_DIR}/sublime_file_name"
         self.f = open(self.file, 'w')
 
     def on_activated_async(self, view: View):
@@ -21,9 +33,3 @@ class FileNameListener(EventListener):
         self.f.seek(0)
         self.f.write(self.myname.replace(r' ', r'\ '))
         self.f.truncate()
-
-
-class PasteZshCommand(WindowCommand):
-    def run(self):
-        subprocess.Popen(['/usr/bin/pkill', 'zsh', '--signal=USR2']).wait()
-        subprocess.Popen(['swaymsg', '[title="^PopUp$"]', 'scratchpad', 'show,', 'fullscreen', 'disable,', 'move', 'position', 'center,', 'resize', 'set', 'width', '100ppt', 'height', '100ppt,', 'resize', 'shrink', 'up', '1100px,', 'resize', 'grow', 'up', '150px,', 'move', 'down', '1px,','move', 'left', '1px,', 'resize', 'grow', 'right', '2px']).wait()
