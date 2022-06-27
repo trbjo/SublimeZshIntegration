@@ -77,7 +77,9 @@ add-zsh-hook precmd __add_goto_sublime_current_dir_to_zsh_autosuggest_clear_widg
 add-zsh-hook preexec __remove_goto_sublime_current_dir
 
 ${ST_ALIAS}save() {
-    [[ -f "$__subl_file_path" ]] && read sublime_file_name < "$__subl_file_path" || return 1
+    local sublime_file_name _ans _reply
+    [[ -f "$__subl_file_path" ]] && read sublime_file_name < "$__subl_file_path"
+    [[ -z "$sublime_file_name" ]] && return 1
     if [[ "$sublime_file_name" == "/etc/doas.conf" ]]; then
         print "Cannot edit \033[32m\x1B[1m/etc/doas.conf\033[0m, you need to be root"
         return 1
