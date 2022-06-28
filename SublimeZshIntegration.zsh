@@ -11,9 +11,9 @@ case $OSTYPE in
     ;;
 esac
 
+touch $__subl_file_path
 ST_ALIAS=${ST_ALIAS:-st}
-typeset -gi ST_ALIAS_LENGTH=${#ST_ALIAS}
-typeset -gi ST_ALIAS_LENGTH_EXT=$(( ST_ALIAS_LENGTH + 1))
+typeset -gi ST_ALIAS_LENGTH=$(( ${#ST_ALIAS} + 1))
 
 alias -g $ST_ALIAS='"$(cat $__subl_file_path)"'
 alias ${ST_ALIAS}+='chmod +x "$(cat $__subl_file_path)"'
@@ -22,10 +22,10 @@ alias -g ${ST_ALIAS}n='read sublime_file_name < $__subl_file_path; print ${subli
 alias -g ${ST_ALIAS}e='read sublime_file_name < $__subl_file_path; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
 
 st_helper() {
-    if [[ "${LBUFFER: -$ST_ALIAS_LENGTH}" == "$ST_ALIAS" ]]; then
+    if [[ "${LBUFFER: -$ST_ALIAS_LENGTH}" == " $ST_ALIAS" ]] || [[ $LBUFFER == "$ST_ALIAS" ]]; then
         local file
         read file < $__subl_file_path
-        LBUFFER="${LBUFFER[1,-$ST_ALIAS_LENGTH_EXT]}$file "
+        LBUFFER="${LBUFFER[1,-$ST_ALIAS_LENGTH]}$file "
         return 0
     fi
     LBUFFER+=" "
