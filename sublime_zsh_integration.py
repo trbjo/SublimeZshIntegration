@@ -32,7 +32,9 @@ class FileNameListener(EventListener):
             return
         if len(file_name) == 0:
             try:
-                file_name = sublime.active_window().project_data()["folders"][0]["path"]
+                file_name = (
+                    sublime.active_window().project_data()["folders"][0]["path"] + "/"
+                )
             except KeyError:
                 return
         self.myname = file_name
