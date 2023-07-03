@@ -31,12 +31,7 @@ class FileNameListener(EventListener):
         if file_name == self.myname:
             return
         if len(file_name) == 0:
-            try:
-                file_name = (
-                    sublime.active_window().project_data()["folders"][0]["path"] + "/"
-                )
-            except KeyError:
-                return
+            return
         self.myname = file_name
         self.f.seek(0)
         self.f.write(self.myname.replace(r" ", r"\ "))
