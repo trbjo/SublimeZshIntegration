@@ -2,7 +2,6 @@ import platform
 from os import getenv
 from typing import Union
 
-import sublime
 from sublime import View
 from sublime_api import view_file_name
 from sublime_plugin import EventListener
