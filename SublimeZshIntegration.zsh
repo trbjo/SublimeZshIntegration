@@ -90,7 +90,7 @@ ${ST_ALIAS}save() {
     doas mkdir -p "${sublime_file_name%/*}" || return
     doas touch "$sublime_file_name"
     doas chmod 666 "$sublime_file_name"
-    /opt/sublime_text/sublime_text --command save
+    /opt/sublime_text/sublime_text --background --command save
     doas chmod $prevperm "$sublime_file_name"
 }
 
@@ -108,7 +108,7 @@ ${ST_ALIAS}del() {
         esac
     done
     if [[ $_ans == "yes" ]]; then
-        subl --command close
+        /opt/sublime_text/sublime_text --background --command save
         rm $sublime_file_name
     fi
     print
