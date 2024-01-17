@@ -12,7 +12,7 @@ case $OSTYPE in
 esac
 
 touch $__subl_file_path
-ST_ALIAS=${ST_ALIAS:-st}
+ST_ALIAS=${ST_ALIAS:-ss}
 typeset -gi ST_ALIAS_LENGTH=$(( ${#ST_ALIAS} + 1))
 
 alias -g $ST_ALIAS='"$(cat $__subl_file_path)"'
@@ -20,6 +20,23 @@ alias ${ST_ALIAS}+='chmod +x "$(cat $__subl_file_path)"'
 alias ${ST_ALIAS}-='chmod -x "$(cat $__subl_file_path)"'
 alias -g ${ST_ALIAS}n='read sublime_file_name < $__subl_file_path; print ${sublime_file_name##*/} |& tee /dev/tty |& wl-copy -n'
 alias -g ${ST_ALIAS}e='read sublime_file_name < $__subl_file_path; print ${sublime_file_name} |& tee /dev/tty |& wl-copy -n'
+
+(){
+    local s='/opt/sublime_text/sublime_text'
+    alias -g ${(U)ST_ALIAS}=" |& $s - &!; swaymsg -q -- '[app_id=^popup$] move scratchpad; [app_id=sublime_text] focus'"
+    typeset -a sc=($s '--command')
+    alias -g ${ST_ALIAS}json=" |& $s - &!; swaymsg -q -- '[app_id=^popup$] move scratchpad; [app_id=sublime_text] focus'; \
+                           $sc hide_overlay; \
+                           $sc 'format_json {\"indent\": 4, \"sort_keys\": true}';\
+                           $sc set_scratch"
+}
+
+
+# function ${ST_ALIAS}json(){
+     # hide_overlay;
+    # /opt/sublime_text/sublime_text --command
+    # /opt/sublime_text/sublime_text --command set_scratch
+# }
 
 st_helper() {
     if [[ "${LBUFFER: -$ST_ALIAS_LENGTH}" == " $ST_ALIAS" ]] || [[ $LBUFFER == "$ST_ALIAS" ]]; then
@@ -114,3 +131,22 @@ ${ST_ALIAS}del() {
     print
     return 0
 }
+
+
+
+st_helper() {
+    if [[ "$BUFFER" ]]; then
+        if [[ $ST_ALIAS ]] && [[ "${LBUFFER: -$ST_ALIAS_LENGTH}" == " $ST_ALIAS" ]] || [[ $LBUFFER == "$ST_ALIAS" ]]; then
+            local file
+            read file < $__subl_file_path
+            LBUFFER="${LBUFFER[1,-$ST_ALIAS_LENGTH]}$file "
+            return 0
+        fi
+        LBUFFER+=" "
+        return 0
+    fi
+    LBUFFER+="${_ZSH_FILE_OPENER_CMD} "
+    zle expand-or-complete
+}
+zle -N st_helper
+bindkey -e " " st_helper
