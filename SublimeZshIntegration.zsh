@@ -23,7 +23,7 @@ alias -g ${ST_ALIAS}e='read sublime_file_name < $__subl_file_path; print ${subli
 
 (){
     local s='/opt/sublime_text/sublime_text'
-    alias -g ${(U)ST_ALIAS}=" |& $s - &!; swaymsg -q -- '[app_id=^popup$] move scratchpad; [app_id=sublime_text] focus'"
+    alias -g ${(U)ST_ALIAS}="| $s - &!; swaymsg -q -- '[app_id=^popup$] move scratchpad; [app_id=sublime_text] focus'"
     typeset -a sc=($s '--command')
     alias -g ${ST_ALIAS}json=" |& $s - &!; swaymsg -q -- '[app_id=^popup$] move scratchpad; [app_id=sublime_text] focus'; \
                            $sc hide_overlay; \
@@ -131,22 +131,3 @@ ${ST_ALIAS}del() {
     print
     return 0
 }
-
-
-
-st_helper() {
-    if [[ "$BUFFER" ]]; then
-        if [[ $ST_ALIAS ]] && [[ "${LBUFFER: -$ST_ALIAS_LENGTH}" == " $ST_ALIAS" ]] || [[ $LBUFFER == "$ST_ALIAS" ]]; then
-            local file
-            read file < $__subl_file_path
-            LBUFFER="${LBUFFER[1,-$ST_ALIAS_LENGTH]}$file "
-            return 0
-        fi
-        LBUFFER+=" "
-        return 0
-    fi
-    LBUFFER+="${_ZSH_FILE_OPENER_CMD} "
-    zle expand-or-complete
-}
-zle -N st_helper
-bindkey -e " " st_helper
